@@ -1,5 +1,5 @@
 """
-macOS Desktop POC #4: find every button in Reminders using a full
+macOS Desktop POC #4: find every button in Todoist using a full
 descendants scan (enumerate ALL controls, then filter by role+title).
 
 This mirrors the approach of windows_poc_click_addtask.py which uses
@@ -26,10 +26,10 @@ from ApplicationServices import (
 )
 from Quartz import CGEventCreateKeyboardEvent, CGEventPost, kCGHIDEventTap
 
-APP_NAME = "Reminders"
-APP_BUNDLE_ID = "com.apple.reminders"
+APP_NAME = "Todoist"
+APP_BUNDLE_ID = "com.todoist.mac.Todoist"
 
-TARGET_TERMS = ("add", "new reminder", "new item")
+TARGET_TERMS = ("add task", "add", "new task")
 
 
 def _check_accessibility() -> None:
@@ -97,7 +97,7 @@ def main() -> None:
 
     windows = _ax_attr(app_ref, "AXWindows") or []
     if not windows:
-        raise RuntimeError("No AX windows found for Reminders")
+        raise RuntimeError("No AX windows found for Todoist")
     main_window = windows[0]
     t_attach = time.perf_counter() - t0
     print(f"Attach (launch+focus):          {t_attach:6.2f}s")

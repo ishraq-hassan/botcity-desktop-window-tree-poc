@@ -1,5 +1,5 @@
 """
-macOS Desktop POC #2: click ONE button in Reminders without dumping the tree.
+macOS Desktop POC #2: click ONE button in Todoist without dumping the tree.
 Uses a depth-first search that stops at the first match — the macOS equivalent
 of pywinauto's lazy child_window() lookup.
 
@@ -25,12 +25,12 @@ from ApplicationServices import (
 )
 from Quartz import CGEventCreateKeyboardEvent, CGEventPost, kCGHIDEventTap
 
-APP_NAME = "Reminders"
-APP_BUNDLE_ID = "com.apple.reminders"
+APP_NAME = "Todoist"
+APP_BUNDLE_ID = "com.todoist.mac.Todoist"
 
-# Button to look for — "Add" is the toolbar "+" button in Reminders.
+# Button to look for — "Add task" in Todoist's toolbar.
 TARGET_ROLE = "AXButton"
-TARGET_TERMS = ("add", "new reminder", "new item")
+TARGET_TERMS = ("add task", "add", "new task")
 
 
 def _check_accessibility() -> None:
@@ -112,7 +112,7 @@ def main() -> None:
 
     windows = _ax_attr(app_ref, "AXWindows") or []
     if not windows:
-        raise RuntimeError("No AX windows found for Reminders")
+        raise RuntimeError("No AX windows found for Todoist")
     main_window = windows[0]
     t_attach = time.perf_counter() - t0
     print(f"Attach:        {t_attach * 1000:6.0f}ms")

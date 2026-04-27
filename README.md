@@ -15,11 +15,11 @@ This POC evaluates the feasibility and performance of four approaches for locati
 | **#3** | `windows_poc_click_each_index.py` | Iterate `found_index` — click every match | ~5.3 s for 2 buttons |
 | **#4** | `windows_poc_click_addtask.py` | `descendants()` scan + click all matches | ~13 s estimated |
 
-### macOS (Reminders — native app)
+### macOS (Todoist — Electron app)
 
 | POC | Script | Approach |
 |-----|--------|----------|
-| **#1** | `macos_poc_reminders.py` | Full AX tree dump to file |
+| **#1** | `macos_poc_todoist.py` | Full AX tree dump to file |
 | **#2** | `macos_poc_click_one.py` | DFS — stop at first match, click via `AXPress` |
 | **#3** | `macos_poc_click_each_index.py` | Single DFS pass — collect all matches, click each |
 | **#4** | `macos_poc_click_addtask.py` | Full descendants scan, filter, then click |
@@ -36,6 +36,7 @@ This POC evaluates the feasibility and performance of four approaches for locati
 ### macOS
 - **macOS 12+**
 - **Python 3.10+**
+- **Todoist desktop app** installed
 - **Accessibility access** granted to your terminal app:
   System Settings → Privacy & Security → Accessibility
 
@@ -75,10 +76,10 @@ uv run python windows_poc_click_addtask.py
 ### macOS
 
 ```bash
-# POC #1 — Launch Reminders, walk the full AX tree, dump to file
-uv run python macos_poc_reminders.py
+# POC #1 — Launch Todoist, walk the full AX tree, dump to file
+uv run python macos_poc_todoist.py
 
-# POC #2 — Click ONE "Add" button (DFS, stop at first match)
+# POC #2 — Click ONE "Add task" button (DFS, stop at first match)
 uv run python macos_poc_click_one.py
 
 # POC #3 — Click EVERY matching button (single DFS pass)
@@ -140,7 +141,7 @@ uv run pyright                     # type check
 ├── windows_poc_click_one.py        # Windows POC #2 — single click
 ├── windows_poc_click_each_index.py # Windows POC #3 — iterate found_index
 ├── windows_poc_click_addtask.py    # Windows POC #4 — descendants() scan
-├── macos_poc_reminders.py          # macOS POC #1 — AX tree dump (Reminders)
+├── macos_poc_todoist.py            # macOS POC #1 — AX tree dump (Todoist)
 ├── macos_poc_click_one.py          # macOS POC #2 — DFS first match click
 ├── macos_poc_click_each_index.py   # macOS POC #3 — DFS all matches click
 ├── macos_poc_click_addtask.py      # macOS POC #4 — descendants scan

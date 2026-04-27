@@ -1,5 +1,5 @@
 """
-macOS Desktop POC #1: launch Reminders.app, attach via the macOS
+macOS Desktop POC #1: launch Todoist, attach via the macOS
 Accessibility API, walk the full AX tree, and dump every control to disk.
 Times each stage with time.perf_counter().
 
@@ -26,9 +26,9 @@ from ApplicationServices import (
     kAXErrorSuccess,
 )
 
-APP_NAME = "Reminders"
-APP_BUNDLE_ID = "com.apple.reminders"
-LOG_FILE = Path(__file__).parent / "reminders_tree.log"
+APP_NAME = "Todoist"
+APP_BUNDLE_ID = "com.todoist.mac.Todoist"
+LOG_FILE = Path(__file__).parent / "todoist_tree_macos.log"
 
 
 def _check_accessibility() -> None:
@@ -133,7 +133,7 @@ def main() -> None:
         windows = _ax_attr(app_ref, "AXWindows") or []
 
     if not windows:
-        raise RuntimeError("No AX windows found for Reminders")
+        raise RuntimeError("No AX windows found for Todoist")
 
     main_window = windows[0]
     win_title = _ax_attr(main_window, "AXTitle") or "(untitled)"
