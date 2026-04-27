@@ -39,15 +39,12 @@ def main() -> None:
     todoist_pids = {
         p.info["pid"]
         for p in psutil.process_iter(["pid", "exe"])
-        if p.info.get("exe")
-        and Path(p.info["exe"]).resolve() == Path(APP_PATH).resolve()
+        if p.info.get("exe") and Path(p.info["exe"]).resolve() == Path(APP_PATH).resolve()
     }
     main_window = None
     deadline = time.perf_counter() + 30
     while time.perf_counter() < deadline:
-        for w in Desktop(backend="uia").windows(
-            class_name="Chrome_WidgetWin_1", visible_only=True
-        ):
+        for w in Desktop(backend="uia").windows(class_name="Chrome_WidgetWin_1", visible_only=True):
             try:
                 if w.process_id() in todoist_pids and w.rectangle().width() > 0:
                     main_window = w
@@ -60,9 +57,7 @@ def main() -> None:
     if main_window is None:
         raise RuntimeError("No visible Todoist window found within 30s")
     t_window = time.perf_counter() - t2
-    print(
-        f"Find main window: {t_window:6.2f}s   title={main_window.window_text()!r}  class={main_window.class_name()}"
-    )
+    print(f"Find main window: {t_window:6.2f}s   title={main_window.window_text()!r}  class={main_window.class_name()}")
 
     t3 = time.perf_counter()
     window_spec = Desktop(backend="uia").window(handle=main_window.handle)
@@ -76,9 +71,7 @@ def main() -> None:
     with LOG_FILE.open(encoding="utf-8", errors="ignore") as f:
         lines = sum(1 for _ in f)
 
-    print(
-        f"Dump tree:        {t_tree:6.2f}s   -> {LOG_FILE.name} ({lines} lines, {size:,} bytes)"
-    )
+    print(f"Dump tree:        {t_tree:6.2f}s   -> {LOG_FILE.name} ({lines} lines, {size:,} bytes)")
     print(f"TOTAL:            {time.perf_counter() - t0:6.2f}s")
 
 

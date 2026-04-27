@@ -21,14 +21,11 @@ def find_todoist_window():
     todoist_pids = {
         p.info["pid"]
         for p in psutil.process_iter(["pid", "exe"])
-        if p.info.get("exe")
-        and Path(p.info["exe"]).resolve() == Path(APP_PATH).resolve()
+        if p.info.get("exe") and Path(p.info["exe"]).resolve() == Path(APP_PATH).resolve()
     }
     deadline = time.perf_counter() + 30
     while time.perf_counter() < deadline:
-        for w in Desktop(backend="uia").windows(
-            class_name="Chrome_WidgetWin_1", visible_only=True
-        ):
+        for w in Desktop(backend="uia").windows(class_name="Chrome_WidgetWin_1", visible_only=True):
             try:
                 if w.process_id() in todoist_pids and w.rectangle().width() > 0:
                     return w
@@ -61,9 +58,7 @@ def main() -> None:
         cycle_start = time.perf_counter()
 
         try:
-            btn = win_spec.child_window(
-                title="Add task", control_type="Button", found_index=i
-            )
+            btn = win_spec.child_window(title="Add task", control_type="Button", found_index=i)
             btn.wait("exists visible enabled", timeout=1)
         except Exception as exc:
             print(f"  index {i}: no more matches ({type(exc).__name__}) — stopping")

@@ -1,0 +1,71 @@
+[project]
+name = "botcity-desktop-window-tree-poc"
+version = "0.1.0"
+description = "Proof-of-concept: BotCity desktop automation with UIA window tree inspection"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "botcity-framework-core",
+    "psutil>=5.9.0",
+    "pywinauto>=0.6.8",
+]
+
+[dependency-groups]
+dev = [
+    "black>=24.0.0",
+    "isort>=5.13.0",
+    "pre-commit>=3.6.0",
+    "pyright>=1.1.350",
+    "ruff>=0.8.0",
+]
+
+# ---------------------------------------------------------------------------
+# Ruff
+# ---------------------------------------------------------------------------
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort (ruff's built-in import sorting — runs alongside isort)
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "SIM",    # flake8-simplify
+    "RUF",    # ruff-specific rules
+]
+ignore = [
+    "E501",   # line too long — handled by black
+]
+
+[tool.ruff.lint.per-file-ignores]
+"poc_*.py" = ["B", "SIM"]  # POC scripts are intentionally verbose
+
+# ---------------------------------------------------------------------------
+# Black
+# ---------------------------------------------------------------------------
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+
+# ---------------------------------------------------------------------------
+# isort
+# ---------------------------------------------------------------------------
+[tool.isort]
+profile = "black"
+line_length = 120
+known_third_party = ["botcity", "psutil", "pywinauto"]
+
+# ---------------------------------------------------------------------------
+# Pyright
+# ---------------------------------------------------------------------------
+[tool.pyright]
+pythonVersion = "3.10"
+typeCheckingMode = "basic"
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportAttributeAccessIssue = false  # pywinauto.Desktop & sys.stdout.reconfigure are Windows-only

@@ -21,14 +21,11 @@ def find_todoist_window():
     todoist_pids = {
         p.info["pid"]
         for p in psutil.process_iter(["pid", "exe"])
-        if p.info.get("exe")
-        and Path(p.info["exe"]).resolve() == Path(APP_PATH).resolve()
+        if p.info.get("exe") and Path(p.info["exe"]).resolve() == Path(APP_PATH).resolve()
     }
     deadline = time.perf_counter() + 30
     while time.perf_counter() < deadline:
-        for w in Desktop(backend="uia").windows(
-            class_name="Chrome_WidgetWin_1", visible_only=True
-        ):
+        for w in Desktop(backend="uia").windows(class_name="Chrome_WidgetWin_1", visible_only=True):
             try:
                 if w.process_id() in todoist_pids and w.rectangle().width() > 0:
                     return w
@@ -57,9 +54,7 @@ def main() -> None:
     # Lazy lookup — pywinauto walks UIA until it finds the first match,
     # then stops. No full tree dump.
     t1 = time.perf_counter()
-    add_btn = win_spec.child_window(
-        title="Add task", control_type="Button", found_index=0
-    )
+    add_btn = win_spec.child_window(title="Add task", control_type="Button", found_index=0)
     add_btn.wait("exists visible enabled", timeout=10)
     t_locate = time.perf_counter() - t1
     print(f"Locate button: {t_locate * 1000:6.0f}ms   rect={add_btn.rectangle()}")
