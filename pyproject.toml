@@ -43,7 +43,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"poc_*.py" = ["B", "SIM"]  # POC scripts are intentionally verbose
+"*_poc_*.py" = ["B", "SIM"]  # POC scripts are intentionally verbose
 
 # ---------------------------------------------------------------------------
 # Black
