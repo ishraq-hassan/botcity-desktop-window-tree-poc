@@ -17,13 +17,17 @@ import sys
 import time
 from pathlib import Path
 
-from AppKit import NSRunningApplication, NSWorkspace
+from AppKit import NSApplicationActivateIgnoringOtherApps, NSWorkspace
 from ApplicationServices import (
     AXIsProcessTrusted,
     AXUIElementCopyAttributeNames,
     AXUIElementCopyAttributeValue,
     AXUIElementCreateApplication,
+    AXUIElementSetAttributeValue,
+    AXValueGetValue,
     kAXErrorSuccess,
+    kAXValueCGPointType,
+    kAXValueCGSizeType,
 )
 
 APP_NAME = "Todoist"
@@ -54,9 +58,13 @@ def _ax_attrs(element):
 
 def _format_rect(element) -> str:
     """Return 'x,y wxh' from AXPosition + AXSize, or '' if unavailable."""
-    pos = _ax_attr(element, "AXPosition")
-    size = _ax_attr(element, "AXSize")
-    if pos is None or size is None:
+    pos_ref = _ax_attr(element, "AXPosition")
+    size_ref = _ax_attr(element, "AXSize")
+    if pos_ref is None or size_ref is None:
+        return ""
+    ok_p, pos = AXValueGetValue(pos_ref, kAXValueCGPointType, None)
+    ok_s, size = AXValueGetValue(size_ref, kAXValueCGSizeType, None)
+    if not (ok_p and ok_s):
         return ""
     return f"({pos.x:.0f},{pos.y:.0f} {size.width:.0f}x{size.height:.0f})"
 
@@ -122,12 +130,15 @@ def main() -> None:
     # --- Create AX ref & get main window ---
     t2 = time.perf_counter()
     app_ref = AXUIElementCreateApplication(pid)
+    # Force Chromium/Electron apps to expose their full AX tree.
+    AXUIElementSetAttributeValue(app_ref, "AXManualAccessibility", True)
+    time.sleep(1.0)
     windows = _ax_attr(app_ref, "AXWindows") or []
     if not windows:
         # Bring app to front and wait a moment
         for app in NSWorkspace.sharedWorkspace().runningApplications():
             if app.bundleIdentifier() == APP_BUNDLE_ID:
-                app.activateWithOptions_(NSRunningApplication.NSApplicationActivateIgnoringOtherApps)
+                app.activateWithOptions_(NSApplicationActivateIgnoringOtherApps)
                 break
         time.sleep(1)
         windows = _ax_attr(app_ref, "AXWindows") or []

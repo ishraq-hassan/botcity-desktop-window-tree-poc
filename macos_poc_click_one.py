@@ -15,13 +15,17 @@ import subprocess
 import sys
 import time
 
-from AppKit import NSRunningApplication, NSWorkspace
+from AppKit import NSApplicationActivateIgnoringOtherApps, NSWorkspace
 from ApplicationServices import (
     AXIsProcessTrusted,
     AXUIElementCopyAttributeValue,
     AXUIElementCreateApplication,
     AXUIElementPerformAction,
+    AXUIElementSetAttributeValue,
+    AXValueGetValue,
     kAXErrorSuccess,
+    kAXValueCGPointType,
+    kAXValueCGSizeType,
 )
 from Quartz import CGEventCreateKeyboardEvent, CGEventPost, kCGHIDEventTap
 
@@ -58,9 +62,13 @@ def _matches(element) -> bool:
 
 
 def _format_rect(element) -> str:
-    pos = _ax_attr(element, "AXPosition")
-    size = _ax_attr(element, "AXSize")
-    if pos is None or size is None:
+    pos_ref = _ax_attr(element, "AXPosition")
+    size_ref = _ax_attr(element, "AXSize")
+    if pos_ref is None or size_ref is None:
+        return ""
+    ok_p, pos = AXValueGetValue(pos_ref, kAXValueCGPointType, None)
+    ok_s, size = AXValueGetValue(size_ref, kAXValueCGSizeType, None)
+    if not (ok_p and ok_s):
         return ""
     return f"({pos.x:.0f},{pos.y:.0f} {size.width:.0f}x{size.height:.0f})"
 
@@ -102,13 +110,15 @@ def main() -> None:
     subprocess.Popen(["open", "-a", APP_NAME])
     pid = find_app_pid(APP_BUNDLE_ID)
     app_ref = AXUIElementCreateApplication(pid)
+    # Force Chromium/Electron apps to expose their full AX tree.
+    AXUIElementSetAttributeValue(app_ref, "AXManualAccessibility", True)
 
     # Bring to front
     for app in NSWorkspace.sharedWorkspace().runningApplications():
         if app.bundleIdentifier() == APP_BUNDLE_ID:
-            app.activateWithOptions_(NSRunningApplication.NSApplicationActivateIgnoringOtherApps)
+            app.activateWithOptions_(NSApplicationActivateIgnoringOtherApps)
             break
-    time.sleep(0.3)
+    time.sleep(1.0)
 
     windows = _ax_attr(app_ref, "AXWindows") or []
     if not windows:
